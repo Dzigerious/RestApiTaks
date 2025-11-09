@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Вивчити Express.js",
+    "description": "Прочитати лекцію, переглянути приклади маршрутів та middleware.",
+    "completed": false
+  },
+  {
+    "id": 2,
+    "title": "Створити REST API",
+    "description": "Реалізувати CRUD для ресурсу tasks з методами GET, POST, PUT, DELETE.",
+    "completed": true
+  },
+  {
+    "id": 3,
+    "title": "Підключити Swagger",
+    "description": "Додати swagger-jsdoc і swagger-ui-express для документування API.",
+    "completed": false
+  },
+  {
+    "id": 4,
+    "title": "Протестувати API у Postman",
+    "description": "Перевірити всі маршрути з реальними запитами і відповідями.",
+    "completed": false
+  },
+  {
+    "id": 5,
+    "title": "Додати обробку помилок",
+    "description": "Обробити випадки, коли task не знайдено або дані не валідні.",
+    "completed": false
+  }
+]
