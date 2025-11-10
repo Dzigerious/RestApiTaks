@@ -7,34 +7,43 @@ const app = express();
 
 const port = 3000;
 
-app.use((req, res, next) => {
+const requireToken =  (req, res, next) => {
     const token = req.query.token;
     console.log(`The token is: ${token}`);
-    
+
     if (!token) {
-        console.log('There is no token in the program!');
-        return res.status(403).send({ message: 'forbidden' });
+        console.log("There is no token in the program");
+        return res.status(403).json({ message: 'forbidden' });
     }
 
-    next();
-});
+    next()
+}
 
 app.use(express.static(__dirname + `/public`));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//  app.use('/tasks', requireToken);
 
 const filePathTasks = path.join(__dirname, 'api', 'data', 'tasks.json');
 
 const parseTasks = function (filepath) {
     return new Promise((resolve, reject) => {
         fs.readFile(filepath, 'utf-8', (err, data) => {
-            if (err) return reject(err);
+            if (err) {
+                if (err.code === "ENOENT") return resolve([]);
+                return reject(err);
+            }
 
-            try {
+            if (!data.trim()){
+                resolve([]);
+            }
+
+            try{
                 const tasks = JSON.parse(data);
-                resolve(tasks);
+                resolve(Array.isArray(tasks) ? tasks : []); 
             } catch (parseError) {
-                reject(parseError);
+                console.error(`Invalid JSON in tasks file: `, parseError);
+                return reject(parseError);
             }
         });
     });
@@ -47,6 +56,14 @@ const saveTasks = async (filepath, tasks) => {
             resolve();
         });
     });
+};
+
+const getNextId = (tasks) => {
+    return tasks.length ? Math.max(...tasks.map(t => typeof t.id === 'number' ? t.id : Number(t.id) || 0)) : 0;
+}
+
+const isTaskCompleted = (value) => {
+    return value === true || value === "true" || value === 'on';
 };
 
 app.get('/tasks', async (req, res) => {
@@ -69,21 +86,10 @@ app.post('/tasks/add', async (req, res) => {
             });
         }
 
-        const isCompletedRaw = req.body.completed;
-        const isCompleted =
-            isCompletedRaw === 'true' ||
-            isCompletedRaw === true ||
-            isCompletedRaw === 'on';
-
+        const isCompleted = isTaskCompleted(req.body.completed);
         const tasks = await parseTasks(filePathTasks);
 
-        const maxId = tasks.length
-            ? Math.max(
-                  ...tasks.map(t =>
-                      typeof t.id === 'number' ? t.id : Number(t.id) || 0
-                  )
-              )
-            : 0;
+        const maxId = getNextId(tasks);
 
         const newTask = {
             id: maxId + 1,

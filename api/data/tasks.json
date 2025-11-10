@@ -34,5 +34,11 @@
     "title": "ergw",
     "description": "wgrgw",
     "completed": false
+  },
+  {
+    "id": 7,
+    "title": "To do put method in my project",
+    "description": "to do it inside of html",
+    "completed": false
   }
 ]
